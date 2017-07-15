@@ -1,0 +1,62 @@
+This is how I will setup the file structure.
+
+**************** Locations ****************
+
+First off all, PHP scripts for the backend of the site are going to be located in project/php.
+These scripts do all the back-end functionality. As far as the front-end is concerned. The only important thing about
+these scripts are going to be the documentation I provide as a header comment in each file.
+
+Examples for the PHP scripts are in test_example/ (more about that later)
+
+The front end is going to be located in /project. These will be all the html pages (which some will call the php scripts in /php). 
+
+All user uploaded images are going to be located in img/. 
+
+Feel free to make any other directories for the front end here (in /project)
+
+************* PHP ****************
+
+Let me explain the php stuff. PHP are sections of code in addition to normal HTML blocks. PHP runs
+entirely on the server side. Therefore the PHP blocks are hidden in the html source code once they are dislayed on the user. 
+So you need to view the PHP on the server to see the entire source. (FileZilla/ FTP into it!). Back to PHP, PHP will be used 
+to do either one of two things (in most cases). The first is running some script in the backend and generating some HTML that 
+can be inserted into the section you provide it. An example is this <?php echo "hello"; ?>.  This will generate a displayed html 
+of "hello". But it goes beyond that to displaying any tags: <?php echo "<b>hello</b>"; ?> will display some html text in bold. 
+HTML blocks start with "<?php" and end with "?>" as shown in the examples. "echo" is the equivalent of "print". Finally, php also 
+has variables. This starts with the dollar sign ($). So we can display variable text. Ex: 
+
+"<?php 
+    $text_to_display="<b>Hello</b>";
+    echo $text_to_display;
+?>
+
+The second method of using PHP is to send data to a php scripts. The HTML protocol itself has several methods of data exchange. 
+The one we will use is called POST which sends data. Here is the example of POST submission:
+
+<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"> 
+    <input type="text" name="email">
+</form>
+
+So there's serveral things going on. The first is the form class. This is will hold all the data to submit to the backend. In this example,
+we only have one data variable that will be sent. This is a textbox (type="text") with associated with the POST variable 
+"email" (name="email"). Next, the form will use POST, so method="post", pretty straightforward. What's left is the submission action.
+$_SERVER["PHP_SELF"] is the name of the current file. So action="<?php echo $_SERVER["PHP_SELF"];?>" gets the file name and submits the 
+form to that file. For example if this were a file called example.php. This would be the equivalent: action="example.php". htmlspecialchars()
+is a method that adds some security measures do to how PHP_SELF can be used. It's only important to know that it needs to be there.
+
+One last thing to know about php is the require_once() function. This is a function equivalent to "#include" in C, which directly inserts 
+a php script into that part of the code block. This is important since we will use this to insert the backend php script into the front end
+page. (Will make more sense later).
+
+Actually, one last, one last thing. The only difference between .php and .html files is that .php can run PHP. A normal .html cannot run PHP.
+In other words, use .php if the html code uses PHP and .html if it doesn't.
+
+**************** PHP Examples ****************
+
+So I created front-end example pages for most backend php scripts. This can be found in test_example/. Copy and modify these to your liking. These will
+only be of minimal functionality. You can view the source code for the documentation or actually run them by visiting them from the webpage
+
+**************** PHP Backend Files ****************
+
+As mentioned before, the PHP back-end scripts are located in PHP and have documentation. All of the important documentation will be at the top
+(as a header comment).

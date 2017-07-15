@@ -1,0 +1,85 @@
+<?php
+/*
+    This function will register a new user on the server.
+    If the registeration is successful, it will goto a 
+    specified page
+
+    Args:
+        POST:
+            "userId": the user id
+            "email": the email address
+            "password": the password
+        Variables ($):
+            "$register_success_page: the page to go to if the registraton is successful
+
+    Returns:
+        $error: an error message that occurs during the process. "" if no error
+*/
+
+// Include common functions
+require_once("common.php");
+
+/*
+$servername = "localhost";
+$username = "student";
+$password = "";
+$dbname = "test";*/
+$error = "";
+
+/*
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} 
+
+echo "Connected successfully\n";
+
+$sql = "INSERT INTO test_table 
+VALUES ('John', 'Doe', 'john@example.com', 'testiong12')";
+
+if ($conn->query($sql) === TRUE) {
+    echo "New record created successfully";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+$conn->close();*/
+
+function register_user($userid, $password, $email) {
+    // TODO: register a user
+    return true;
+}
+
+// During a submission ...
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Check Password 
+    if (empty($_POST["password"])) {
+        $error = "Password is required";
+    } else {
+        $userid = test_input($_POST["password"]);
+    }
+
+    // Check Email 
+    if (empty($_POST["email"])) {
+        $error = "Email is required";
+    } else {
+        $email = test_input($_POST["email"]);
+    }
+
+    // Check UserId 
+    if (empty($_POST["userId"])) {
+        $error = "User Id is required";
+    } else {
+        $userid = test_input($_POST["userId"]);
+    }
+
+    // On success go to the next page
+    if ($error == "") {
+        if (register_user($_POST["userId"], $_POST["password"], $_POST["email"]))
+            goto_page($register_success_page))
+    }
+} 
+
+?>
