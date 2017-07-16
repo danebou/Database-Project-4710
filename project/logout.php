@@ -12,7 +12,7 @@
 <html>
 <head>
 <!-- This automaically redirects to the main page -->
-<meta http-equiv="refresh" content="3; URL=index.php">
+<meta http-equiv="refresh" content="1; URL=index.php">
 <meta name="keywords" content="automatic redirection">
 </head>
 <body>

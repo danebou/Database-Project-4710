@@ -1,4 +1,10 @@
 <?php
+/*
+    university_edit.php
+
+    Has functions that provide access to the list of university editing and submission for data access
+*/ 
+
 // Include common functions
 require_once("common.php");
 

@@ -1,7 +1,7 @@
 <!-- 
-    my_university_list.php
+    event_requests.php
 
-    This will be used to list all the universities for a suepradmin
+    This will be used to list all the non-rso event requests for a suepradmin
 -->
 <?php
     // This takes all of the register functionality and moves it into this file.

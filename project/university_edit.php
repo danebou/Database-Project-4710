@@ -1,10 +1,7 @@
 <!-- 
-    Register.php
+    university_edit.php
 
-    This will be used as the main page to register.
-    Once the submit button is hit, if there is an error, a refresh occurs and displays 
-    the error at the bottom. If there is no error, it will automatically jump to the
-    given success page.
+    This will be used as the page to edit an university
 -->
 <?php
     // If there is a successful registration, it will then jump to this page:
