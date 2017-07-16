@@ -27,7 +27,7 @@ if (!empty($_POST["rsoName"])) {
 
 // Returns true if the user has access to this page (is the superadmin of the university)
 function verify_access($rsoName) {
-    if (empty($_SESSION["userType"]) || $_SESSION["userType"] != "admin") 
+    if (empty($_SESSION["userType"])) 
         return false;
 
     // TODO: verify access

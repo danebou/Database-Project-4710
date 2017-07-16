@@ -22,6 +22,9 @@ Students: <?php echo $uni_student_count?>
 <br>
 
 <?php echo $uni_pics ?>
+<br>
+<?php echo $uni_event_list?>
+
 
 </body>
 </html>
