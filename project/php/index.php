@@ -19,8 +19,10 @@ if (empty($_SESSION["userType"]))
 function get_accessable_page_links() {
     // TODO: ad more links
     $links = "<ul>"; // start list
+    $links = $links.'<li><a href="search_join_rso.php">Search/Join RSO</a> </li>';
+    $links = $links.'<li><a href="my_rso_list.php">My RSOs</a> </li>';
     if ($_SESSION["userType"] == "admin") {
-        $links = $links.'<li><a href="my_rso_list.php">My RSOs</a> </li>';
+        $links = $links.'<li><a href="rso_requests.php">RSO Join Requests</a> </li>';
     }
     if ($_SESSION["userType"] == "superadmin") {
         $links = $links.'<li><a href="my_university_list.php">My Universitys</a> </li>';

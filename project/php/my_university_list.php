@@ -12,7 +12,7 @@ session_start();
 $edit = "";
 
 // Redirect if the user is not a superadmin
-if (empty($_SESSION["userType"]) || $_SESSION["userType"] != "superadmin") 
+if (empty($_SESSION["userType"])) 
     goto_default_page();
 
 // List of universities and edit/delete buttons for current superadmin
@@ -48,7 +48,7 @@ function get_university_name($uid) {
 // Creates a button that will delete a university
 function create_delete_button($uid) {
     return '<form method="POST"> 
-<input type=SUBMIT action="<?php delete_university($uid) ?>"
+<input type=SUBMIT action="<?php delete_university('.$uid.') ?>"
 value="delete"> 
 </form>';
 }
@@ -60,7 +60,7 @@ function delete_university($uid) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    if (!empty($_GET["edit"]) && $_GET["edit"] == "")
+    if (!empty($_GET["edit"]) && $_GET["edit"] == "success")
         $edit = "Successfully edited!";
 }
 

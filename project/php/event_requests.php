@@ -46,14 +46,14 @@ function get_request_name($eid) {
 // Creates a button that will delete a university
 function create_delete_button($eid) {
     return '<form method="POST"> 
-<input type=SUBMIT action="<?php delete_request($eid) ?>"
+<input type=SUBMIT action="<?php delete_request('.$eid.') ?>"
 value="delete"> 
 </form>';
 }
 
 function create_approve_button($eid) {
     return '<form method="POST"> 
-<input type=SUBMIT action="<?php approve_request($eid) ?>"
+<input type=SUBMIT action="<?php approve_request('.$eid.') ?>"
 value="approve"> 
 </form>';
 }

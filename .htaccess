@@ -1,0 +1,4 @@
+AuthName "Username/password needed."
+AuthType Basic
+AuthUserFile D:/xampp/apache/conf/extra/.htpasswd
+require valid-user
