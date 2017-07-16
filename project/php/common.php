@@ -1,5 +1,6 @@
 <?php
 
+$db_name = "collegeevent";
 $default_page = "index.php";
 
 /*

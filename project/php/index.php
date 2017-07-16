@@ -24,6 +24,7 @@ function get_accessable_page_links() {
     }
     if ($_SESSION["userType"] == "superadmin") {
         $links = $links.'<li><a href="my_university_list.php">My Universitys</a> </li>';
+        $links = $links.'<li><a href="event_requests.php">Non-RSO Event Requests</a> </li>';
     }
     $links = $links.'<li><a href="logout.php">Logout</a> </li>';
     $links = $links."</ul>"; // close list

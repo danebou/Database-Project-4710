@@ -23,7 +23,7 @@
 <!-- Login form (Submit to backend in php/login.php"-->
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 Username: <input type="text" name="userId">
-Password: <input type="text" name="password">
+Password: <input type="password" name="password">
 <input type="submit" name="submit" value="Submit"> 
 </form>
 

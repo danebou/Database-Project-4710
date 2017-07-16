@@ -6,30 +6,25 @@
 <?php
     // This takes all of the register functionality and moves it into this file.
     // READ the comment for this file!
-    require_once("php/my_university_list.php");
+    require_once("php/event_requests.php");
 ?>
 <html>
 <body>
 
 <a href="index.php">Home</a>
 <br>
-<b> My Universities </b>
+<b> Non-RSO Event Requests </b>
 <br>
-These are your universities you created
+These are non-RSO events requiring approval
 <br>
 <br>
-Now check out these dope universities you can go to:
+Now check out these dank non-rso event requests you can approve/remove:
 <br>
 
 <!-- Displays available universities --> 
-<?php echo $university_list?>
+<?php echo $event_requests?>
 
 <br>
-
-<a href="university_edit.php">Create New</a>
-
-<br>
-<?php echo $edit ?>
 
 </body>
 </html>

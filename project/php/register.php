@@ -46,7 +46,17 @@ if ($conn->query($sql) === TRUE) {
 
 $conn->close();*/
 
-function register_user($userid, $password, $email) {
+function register_user($userId, $password, $email) {
+    // make sure formats are correct
+    if (test_input($userId) != $userId) {
+        $error = "Invalid username";
+        return false;
+    }
+    if (test_input($password) != $password) {
+        $error = "Invalid password";
+        return false;
+    }
+
     // TODO: register a user
     return true;
 }
@@ -57,28 +67,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check Password 
     if (empty($_POST["password"])) {
         $error = "Password is required";
-    } else {
-        $userid = test_input($_POST["password"]);
     }
 
     // Check Email 
     if (empty($_POST["email"])) {
         $error = "Email is required";
-    } else {
-        $email = test_input($_POST["email"]);
     }
 
     // Check UserId 
     if (empty($_POST["userId"])) {
         $error = "User Id is required";
-    } else {
-        $userid = test_input($_POST["userId"]);
     }
 
     // On success go to the next page
     if ($error == "") {
         if (register_user($_POST["userId"], $_POST["password"], $_POST["email"]))
-            goto_page($register_success_page))
+            goto_page($register_success_page);
     }
 } 
 

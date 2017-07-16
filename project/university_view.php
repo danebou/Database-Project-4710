@@ -4,6 +4,7 @@
     This will be used as the page to publically view a university
 -->
 <?php
+    $uni_pics_dir = "img/"; // The directory where the pics are stored for the university
     // This takes all of the register functionality and moves it into this file.
     // READ the comment for this file!
     require_once("php/university_view.php");
@@ -19,6 +20,8 @@
 <br>
 Students: <?php echo $uni_student_count?> 
 <br>
+
+<?php echo $uni_pics ?>
 
 </body>
 </html>
