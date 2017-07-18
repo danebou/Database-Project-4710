@@ -25,6 +25,8 @@ Students: <?php echo $uni_student_count?>
 <br>
 <?php echo $uni_event_list?>
 
+<!-- This displays any error when registering -->
+<span><?php echo $error?></span>
 
 </body>
 </html>

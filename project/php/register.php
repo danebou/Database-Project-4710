@@ -18,6 +18,7 @@
 
 // Include common functions
 require_once("common.php");
+require_once("database.php");
 
 /*
 $servername = "localhost";
@@ -47,6 +48,7 @@ if ($conn->query($sql) === TRUE) {
 $conn->close();*/
 
 function register_user($userId, $password, $email) {
+    global $error;
     // make sure formats are correct
     if (test_input($userId) != $userId) {
         $error = "Invalid username";
@@ -56,6 +58,24 @@ function register_user($userId, $password, $email) {
         $error = "Invalid password";
         return false;
     }
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "INSERT INTO user (name, uniemail, userType, uid, password)
+    VALUES ('".$userId."', '".$email."', 'student', NULL, '".$password."')";
+
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
 
     // TODO: register a user
     return true;
@@ -85,5 +105,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             goto_page($register_success_page);
     }
 } 
-
 ?>

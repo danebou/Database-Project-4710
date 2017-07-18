@@ -31,5 +31,7 @@ Now check out these radical RSOS you are apart of:
 <br>
 <?php echo $edit?>
 
+<?php echo $error ?>
+
 </body>
 </html>

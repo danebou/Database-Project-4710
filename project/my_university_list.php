@@ -31,5 +31,7 @@ Now check out these dope universities you can go to:
 <br>
 <?php echo $edit ?>
 
+<?php echo $error ?>
+
 </body>
 </html>

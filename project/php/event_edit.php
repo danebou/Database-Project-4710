@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 rso_edit_fill($eid);
 
-function rso_edit_submit($eid, $name, $date, $start_time, $end_time, $event_category, 
+function event_edit_submit($eid, $name, $date, $start_time, $end_time, $event_category, 
     $desc, $topic, $contact_email, $contact_phone, $published) {
     if ($eid == "") { // create
         // TODO: create event
@@ -108,7 +108,15 @@ function rso_edit_submit($eid, $name, $date, $start_time, $end_time, $event_cate
     } // edit
 }
 
-function rso_edit_fill($eid) {
+function event_create() {
+    
+}
+
+function event_edit() {
+
+}
+
+function event_edit_fill($eid) {
     global $name_value, $date_value, $start_time_value, $end_time_value, $event_category_value, 
     $desc_value, $topic_value, $contact_email_value, $contact_phone_value, $published_value;
     if ($eid == "")

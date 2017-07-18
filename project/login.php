@@ -28,7 +28,7 @@ Password: <input type="password" name="password">
 </form>
 
 <!-- This displays any error when logging in -->
-<span><?php echo $error?></span>
+<span><?php echo $error?></span> <br>
 
 <!-- Registration link -->
 New User? <a href="register.php">Register</a>

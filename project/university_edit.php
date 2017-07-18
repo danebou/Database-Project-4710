@@ -23,6 +23,8 @@ University Name: <input type="text" name="name" value="<?php echo $name_value?>"
 <br>
 Number of Students: <input type="text" name="studCount" value="<?php echo $studCount_value?>">
 <br>
+Email Domain (ex: knights.ucf.edu): <input type="text" name="domain" value="<?php echo $domain_value?>">
+<br>
 Description: <textarea name="desc" rows="5" cols="40"><?php echo $desc_value?></textarea>
 <br>
 <input type="hidden" name="uid" value="<?php echo $uid?>">

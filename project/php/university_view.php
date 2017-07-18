@@ -6,6 +6,7 @@
 */ 
 // Include common functions
 require_once("common.php");
+require_once("database.php");
 
 session_start();
 
@@ -16,6 +17,8 @@ $uni_student_count = "";
 $uni_pics = "";
 $uni_event_list = "";
 
+$error = "";
+
 function verify_member() {
     if (empty($_SESSION["userType"])) 
         return false;
@@ -24,19 +27,51 @@ function verify_member() {
 }
 
 function get_rso_events($uid) {
+    global $error;
+
     if (!verify_member()) // Only members can see events
         return array();
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
 
     // TODO: get event
     return array("156", "45");
 }
 
 function set_university($uid) {
-    $picsValue = "test1.png,test2.png,test3.png";
+    global $error;
     global $uni_name, $uni_desc, $uni_student_count, $uni_pics, $uni_event_list;
-    $uni_name = "University ".$uid;
-    $uni_desc = "This is a todo-er. But this university likes to party!";
-    $uni_student_count = "42 (Wow! That's a lot of students!";
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT numOfStudents, name, description, pictures, lid
+            FROM university";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+    $conn->close();
+
+    $picsValue = "test1.png,test2.png,test3.png";
+
+    $uni_name = $row[1];
+    $uni_desc = $row[2];
+    $uni_student_count = $row[0];
     $uni_pics = create_pictures_list($picsValue);
     $uni_event_list = create_event_list(get_rso_events($uid));
 }

@@ -6,10 +6,13 @@
 */ 
 // Include common functions
 require_once("common.php");
+require_once('database.php');
 
 session_start();
 
 $edit = "";
+
+$error = "";
 
 // Redirect if the user is not a user
 if (empty($_SESSION["userType"])) 
@@ -22,25 +25,53 @@ $rso_list = get_rso_list();
     Returns user's universities as rsos
 */
 function find_my_rsos() {
-    // TODO: get actual rsos
-    return array(urlencode("Fight Club"), urlencode("Breakfast Club"));
+    global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return array();
+    }
+
+    $sql = "SELECT DISTINCT R.rsoName, R.adminid 
+            FROM rso R
+            WHERE R.adminid='".$_SESSION["userId"]."'
+            OR EXISTS(SELECT * 
+            FROM stud_joins S
+            WHERE S.rsoName = R.rsoName
+            AND S.userid='".$_SESSION["userId"]."')";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return array();
+    }
+    $rows = array();
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
+    $conn->close();
+
+    return $rows;
 }
 
-function is_owner_of_rso($rsoName) {
+function is_owner_of_rso($rsoName, $rsoAdmin) {
     if ($_SESSION["userType"] != "admin")
         return false;
-    
-    // TODO: determine if admin of page
-    return ($rsoName == urlencode("Fight Club"));
+
+    return ($rsoAdmin == $_SESSION["userId"]);
 }
 
 // Gets a table of unversities links for the current rso
 function get_rso_list() {
     $list = '<table>';
-    foreach (find_my_rsos() as $rsoName) {
+    foreach (find_my_rsos() as $row) {
+        $rsoName = $row["rsoName"];
+        $rsoAdmin = $row["adminid"];
         $list = $list."<tr>"; // Row start     
         $list = $list.'<td><a href=rso_view.php?rsoName='.$rsoName.'>'.urldecode($rsoName).'</a></td>';
-        if (is_owner_of_rso($rsoName)) {
+        if (is_owner_of_rso($rsoName, $rsoAdmin)) {
             $list = $list.'<td><a href=rso_edit.php?rsoName='.$rsoName.'>Edit</a></td>';
             $list = $list."<td>".create_delete_button($rsoName)."</td>"; // Delete button
         }

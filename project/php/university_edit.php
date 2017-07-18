@@ -7,6 +7,7 @@
 
 // Include common functions
 require_once("common.php");
+require_once("database.php");
 
 session_start();
 
@@ -15,8 +16,11 @@ $error = "";
 $name_value = "";
 $studCount_value = "0";
 $desc_value = "";
+$domain_value = "";
 
 $uid = "";
+
+$event_threshold = 1.0;
 
 if (!empty($_GET["uid"])) {
     $uid = $_GET["uid"]; // set uid
@@ -26,17 +30,42 @@ if (!empty($_POST["uid"])) {
 }
 
 // Returns true if the user has access to this page (is the superadmin of the university)
-function verify_access() {
+function verify_access($uid) {
+    global $error;
+
     if (empty($_SESSION["userType"]) || $_SESSION["userType"] != "superadmin") 
         return false;
 
     // TODO: verify access
+    if ($uid == "") // New uni. We are okay
+        return true;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT count(*) FROM university as U WHERE U.createProfileBy = '".$_SESSION["userId"]."'
+    AND U.uid = '".$uid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
+
+    if (($result->fetch_row())[0] <= 0)
+        return false;
 
     return true;
 }
 
 // Verify that the user has access to this page
-if (!verify_access())
+if (!verify_access($uid))
     goto_default_page();
 
 // During a submission ...
@@ -56,11 +85,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $studCount = htmlspecialchars($_POST["studCount"]);
     }
 
+    // Check domain
+    if (empty($_POST["domain"])) {
+        $error = "Domain is required";
+    } else {
+        $domain = htmlspecialchars($_POST["domain"]);
+    }
+
     $desc = htmlspecialchars($_POST["desc"]);
+    $pictures = "";
+    $location = array("test_loc", 0.01, 0.02); // (name, long, lat)
 
     // On success go to the next page
     if ($error == "") {
-        university_edit_submit($uid, $name, $studCount, $desc);
+        university_edit_submit($uid, $name, $studCount, $desc, $pictures, $domain, $location);
         if ($error == "") {
             goto_page($success_page);
         }
@@ -72,21 +110,132 @@ else if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 university_edit_fill($uid);
 
-function university_edit_submit($uid, $name, $studCount, $desc) {
+function university_edit_submit($uid, $name, $studCount, $desc, $pictures, $domain, $location) {
+    
     if ($uid == "") { // create
-        // TODO: create uni
+        create_university($uid, $name, $studCount, $desc, $pictures, $domain, $location);
     } else {
-        // TODO: edit uni
+        edit_university($uid, $name, $studCount, $desc, $pictures, $domain, $location);
     } // edit
 }
 
+function create_university($uid, $name, $studCount, $desc, $pictures, $domain, $location) {
+    global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "INSERT into location (name, latitude, longitude) 
+        VALUES ('".$location[0]."', '".$location[1]."', '".$location[2]."')";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT LAST_INSERT_ID();";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    
+    $lid = ($result->fetch_row())[0];
+
+    $sql = "INSERT into university (numOfStudents, name, description, domain, pictures, createProfileBy, lid) 
+         VALUES ('".$studCount."', '".$name."', '".$desc."', '".$domain."', '".$pictures."', '".$_SESSION["userId"]."', '".$lid."')";
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
+}
+
+function edit_university($uid, $name, $studCount, $desc, $pictures, $domain, $location) {
+    global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT (lid)
+            FROM university U
+            WHERE U.uid = '".$uid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $lid = $result->fetch_row()[0];
+
+    $sql = "UPDATE university 
+        SET numOfStudents='".$studCount."', name='".$name."', description='".$desc."', 
+        domain='".$domain."', pictures='".$pictures."'
+        WHERE uid='".$uid."'"; 
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $sql = "UPDATE location 
+        SET name='".$location[0]."', latitude='".$location[1]."', longitude='".$location[2]."'
+        WHERE lid='".$lid."'"; 
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
+}
+
 function university_edit_fill($uid) {
-    global $name_value, $studCount_value, $desc_value;
+    global $error;
+    global $name_value, $studCount_value, $desc_value, $domain_value;
     if ($uid == "")
         return;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT numOfStudents, name, description, domain, pictures, lid
+            FROM university U
+            WHERE U.uid = '".$uid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+    $conn->close();
+
+    $lid = $row[5];
+
     // TODO: retreive name
-    $name_value = "University ".$uid;
-    $studCount_value = "42";
-    $desc_value = "Wow. You are editing this university! You're a really cool guy! :)";
+    $name_value = $row[1];
+    $studCount_value = $row[0];
+    $desc_value = $row[2];
+    $domain_value = $row[3];
+
 }
 ?>

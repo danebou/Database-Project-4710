@@ -6,6 +6,7 @@
 */ 
 // Include common functions
 require_once("common.php");
+require_once('database.php');
 
 session_start();
 
@@ -22,27 +23,47 @@ $university_list = get_university_list();
     Returns user's universities as uids
 */
 function find_my_universities() {
-    // TODO: get actual universiteis
-    return array("1", "2", "3");
+    global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return array();
+    }
+
+    $sql = "SELECT uid, name
+            FROM university U
+            WHERE U.createProfileBy='".$_SESSION["userId"]."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return array();
+    }
+    $rows = array();
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
+    $conn->close();
+
+    return $rows;
 }
 
 // Gets a table of unversities links for the current superadmin
 function get_university_list() {
     $list = '<table>';
-    foreach (find_my_universities() as $uid) {
+    foreach (find_my_universities() as $row) {
+        $uid = $row["uid"];
+        $name = $row["name"];
         $list = $list."<tr>"; // Row start      
-        $list = $list.'<td><a href=university_view.php?uid='.$uid.'>'.get_university_name($uid).'</a></td>';
+        $list = $list.'<td><a href=university_view.php?uid='.$uid.'>'.$name.'</a></td>';
         $list = $list.'<td><a href=university_edit.php?uid='.$uid.'>Edit</a></td>';
         $list = $list."<td>".create_delete_button($uid)."</td>"; // Delete button
         $list = $list."<tr>"; // Row end
     }
     $list = $list."</table>"; // close list
     return $list;
-}
-
-// Retreives the universty name with a given uid
-function get_university_name($uid) {
-    return "University".$uid;
 }
 
 // Creates a button that will delete a university
@@ -55,6 +76,29 @@ value="delete">
 
 // Deletes a university with a given uid
 function delete_university($uid) {
+    global $error;
+
+    $error = "testing";
+
+    return;
+
+    // Verify userof
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return;
+    }
+
+    // Delete
+    $sql = "DELETE FROM university as U WHERE U.createProfileBy = '".$_SESSION["userId"]."'
+    AND U.uid = '".$uid."'";
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return;
+    }
+
     // TODO delete university
     refresh();
 }
