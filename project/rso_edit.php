@@ -10,6 +10,7 @@
     // READ the comment for this file!
     require_once("php/rso_edit.php");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -188,15 +189,15 @@
                 </div>
                 <div class="card-block">
                     <p class="small-text">
-                    	<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-                        RSO Name: <input type="text" name="newName" value="<?php echo $name_value?>">
-                    </p>
-                    <p class="small-text"> Number of Students: <?php echo $studCount_value?> <!-- Cannot be edited --> </p>
-                    <p class="small-text"> Description: <textarea name="desc" rows="5" cols="40"><?php echo $desc_value?></textarea> </p>
-                    <p class="small-text">
-                    	<input type="hidden" name="rsoName" value="<?php echo $rsoName?>">
-						<input type="submit" name="submit" value="Submit"> 
-						</form>
+                    	<!-- Registration form (Submit to backend in php/register.php"-->
+                      <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+                      RSO Name: <input type="text" name="newName" value="<?php echo $name_value?>">
+                      <br>
+                      Description: <textarea name="desc" rows="5" cols="40"><?php echo $desc_value?></textarea>
+                      <br>
+                      <input type="hidden" name="rsoName" value="<?php echo $rsoName?>">
+                      <input type="submit" name="submit" value="Submit"> 
+                      </form>
                     </p>
                 </div>
             </div>

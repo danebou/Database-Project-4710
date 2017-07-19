@@ -224,6 +224,8 @@
     <!-- Custom scripts for this template -->
     <script src="js/sb-admin.min.js"></script>
 
+<?php echo $error?>
+
 </body>
 
 </html>

@@ -105,48 +105,11 @@ function get_university_list() {
         $list = $list."<tr>"; // Row start      
         $list = $list.'<td><a href=university_view.php?uid='.$uid.'>'.$name.'</a></td>';
         $list = $list.'<td><a href=university_edit.php?uid='.$uid.'>Edit</a></td>';
-        $list = $list."<td>".create_delete_button($uid)."</td>"; // Delete button
+        $list = $list.'<td><a href=delete_university.php?uid='.$uid.'>Delete</a></td>'; // Delete button
         $list = $list."<tr>"; // Row end
     }
     $list = $list."</table>"; // close list
     return $list;
-}
-
-// Creates a button that will delete a university
-function create_delete_button($uid) {
-    return '<form method="POST"> 
-<input type=SUBMIT action="<?php delete_university('.$uid.') ?>"
-value="delete"> 
-</form>';
-}
-
-// Deletes a university with a given uid
-function delete_university($uid) {
-    global $error;
-
-    $error = "testing";
-
-    return;
-
-    // Verify userof
-    $conn = connect_to_db();
-    if ($conn->connect_error) {
-        $error = ("Connection failed: " . $conn->connect_error);
-        $conn->close();
-        return;
-    }
-
-    // Delete
-    $sql = "DELETE FROM university as U WHERE U.createProfileBy = '".$_SESSION["userId"]."'
-    AND U.uid = '".$uid."'";
-    if (!$conn->query($sql)) {
-        $error = "Error: " . $sql . "<br>" . $conn->error;
-        $conn->close();
-        return;
-    }
-
-    // TODO delete university
-    refresh();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {

@@ -20,7 +20,7 @@ $desc_value = "";
 $rsoName = "";
 
 if (!empty($_GET["rsoName"])) {
-    $rsoName = $_GET["rsoName"]; // set name
+    $rsoName = urldecode($_GET["rsoName"]); // set name
 }
 if (!empty($_POST["rsoName"])) {
     $rsoName = $_POST["rsoName"]; // set namne
@@ -80,7 +80,7 @@ function verify_access($rsoName) {
         return false;
 
     // Give access to new rso
-    if ($rsoName == "")
+    if ($rsoName == "" && $_SESSION["userType"] != "superadmin")
         return true;
 
     if ($_SESSION["userType"] != "admin")
@@ -93,8 +93,10 @@ function verify_access($rsoName) {
         return false;
     }
 
-    $sql = "SELECT count(*) FROM rso as R WHERE R.adminid = '".$_SESSION["userId"]."'
-    AND R.rsoName = '".$rsoName."'";
+    $sql = sprintf("SELECT count(*) 
+    FROM rso as R 
+    WHERE R.adminid = '%s'
+    AND R.rsoName = '%s'", $_SESSION["userId"], $rsoName);
     $result = $conn->query($sql);
     if (!$result) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
@@ -102,10 +104,10 @@ function verify_access($rsoName) {
         return false;
     }
 
-    $conn->close();
-
     if (($result->fetch_row())[0] <= 0)
         return false;
+
+    $conn->close();
     
     return true;
 }
@@ -121,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST["newName"])) {
         $error = "Name is required";
     } else {
-        $newName = urlencode(test_input($_POST["newName"]));
+        $newName = test_input($_POST["newName"]);
     }
 
     $desc = htmlspecialchars($_POST["desc"]);
@@ -141,7 +143,7 @@ function rso_edit_submit($rsoNameOld, $rsoNameNew, $desc) {
     if ($rsoNameOld == "") { // create
         rso_create($rsoNameNew, $desc);
     } else {
-        // TODO: edit uni
+        rso_edit($rsoNameOld, $rsoNameNew, $desc);
     } // edit
 }
 
@@ -178,17 +180,53 @@ function rso_create($name, $desc) {
     $conn->close();
 }
 
-function rso_edit() {
+function rso_edit($rsoNameOld, $rsoNameNew, $desc) {
+    global $error;
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
 
+    // Insert rso
+    $sql = "UPDATE rso
+        SET rsoName='".$rsoNameNew."', description='".$desc."' 
+        WHERE rsoName = '".$rsoNameOld."' AND adminid='".$_SESSION["userId"]."'";
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
 }
 
 function rso_edit_fill($rsoName) {
     global $name_value, $studCount_value, $desc_value;
     if ($rsoName == "")
         return;
-    // TODO: retreive name
     $name_value = $rsoName;
-    $studCount_value = "42"; // TODO: get student count
-    $desc_value = "Wow. You are editing this RSO! You're a really cool guy! :)";
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT description
+            FROM rso R
+            WHERE R.rsoName ='".$rsoName."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    
+    $row = $result->fetch_row();
+    $desc_value = $row[0];
+    $conn->close();
 }
 ?>

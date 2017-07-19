@@ -218,6 +218,8 @@
 
     <!-- Custom scripts for this template -->
     <script src="js/sb-admin.min.js"></script>
+<br>
+<?php echo $error?>
 
 </body>
 

@@ -7,6 +7,7 @@
 
 // Include common functions
 require_once("common.php");
+require_once("database.php");
 
 session_start();
 
@@ -14,14 +15,17 @@ $error = "";
 
 $name_value = "";
 $date_value = "";
-$start_time_value = "";
-$end_time_value = "";
 $event_category_value = "";
 $desc_value = "";
 $topic_value = "";
 $contact_email_value = "";
 $contact_phone_value = "";
 $published_value = "";
+$visibility_value = "";
+$loc_desc_value = "";
+$loc_long_value = 0.0;
+$loc_lat_value = 0.0;
+$loc_use_default = true;
 
 $eid = "";
 
@@ -109,18 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $date = test_input($_POST["date"]);
     }
 
-    if (empty($_POST["start_time"])) {
-        $error = "Start time is required";
-    } else {
-        $start_time = test_input($_POST["start_time"]);
-    }
-
-    if (empty($_POST["end_time"])) {
-        $error = "End time is required";
-    } else {
-        $end_time = test_input($_POST["end_time"]);
-    }
-
     if (empty($_POST["contact_email"])) {
         $error = "Contact email is required";
     } else {
@@ -133,12 +125,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $contact_phone = test_input($_POST["contact_phone"]);
     }
 
-    $desc = htmlspecialchars($_POST["desc"]);
+    $desc = $_POST["desc"];
+    $event_category = $_POST["desc"];
+    $topic = $_POST["desc"];
+    $visibility = $_POST["visibility"];
+
+    $location = array($_POST["loc_desc"], $_POST["loc_lat"], $_POST["loc_long"]); // (name, long, lat)
 
     // On success go to the next page
     if ($error == "") {
-        event_edit_submit($eid, $name, $date, $start_time, $end_time, $event_category, 
-        $desc, $topic, $contact_email, $contact_phone, $published);
+        rso_edit_submit($eid, $name, $date, $event_category, 
+        $desc, $topic, $contact_email, $contact_phone, $location, $visibility, $rsoName);
         if ($error == "") {
             goto_page($success_page);
         }
@@ -147,50 +144,129 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 event_edit_fill($eid);
 
-function event_edit_submit($eid, $name, $date, $start_time, $end_time, $event_category, 
-    $desc, $topic, $contact_email, $contact_phone, $published) {
+function event_edit_submit($eid, $name, $date, $event_category, 
+        $desc, $topic, $contact_email, $contact_phone, $location, $visibility, $rsoName) {
+    $uid = $_SESSION["userUni"];
     if ($eid == "") { // create
-        // TODO: create event
+        event_create($name, $date, $event_category, 
+        $desc, $topic, $contact_email, $contact_phone, $location);
     } else {
-        // TODO: edit event
+        event_edit($eid, $name, $date, $event_category, 
+            $desc, $topic, $contact_email, $contact_phone, $location);
     } // edit
 }
 
-function event_create() {
+function event_create($name, $date, $event_category, 
+        $desc, $topic, $contact_email, $contact_phone, $location, $visibility, $rsoName) {
+        global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "INSERT into location (description, latitude, longitude) 
+        VALUES ('".$location[0]."', '".$location[1]."', '".$location[2]."')";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT LAST_INSERT_ID();";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
     
+    $lid = ($result->fetch_row())[0];
+
+    $sql = sprintf("INSERT into event (name, dateTime, topic, contactEmail, eventCategory, contactPhone, description, visibility, rsoName, lid, uid, owner, approved) 
+         VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %s, '%s', %s, '%s', '%s')",
+         $name,
+         $date,
+         $topic,
+         $contact_email,
+         $contact_phone,
+         $description,
+         $visibility,
+         $rsoName == "" ? NULL : "'" + $rsoName + "'",
+         $lid,
+         $uid == "" ? NULL : "'" + $uid + "'",
+         $SESSION["userId"],
+         (visibility == "Public" ? "0" : "1")
+         );
+    if (!$conn->query($sql)) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $conn->close();
 }
 
-function event_edit() {
+function event_edit($eid, $name, $date, $event_category, 
+        $desc, $topic, $contact_email, $contact_phone, $location) {
 
 }
 
 function event_edit_fill($eid) {
-    global $name_value, $date_value, $start_time_value, $end_time_value, $event_category_value, 
-    $desc_value, $topic_value, $contact_email_value, $contact_phone_value, $published_value;
+    global $name_value, $date_value, $event_category_value, $visibility_value,
+    $desc_value, $topic_value, $contact_email_value, $contact_phone_value;
+    global $error;
+
     if ($eid == "")
         return;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT *
+            FROM event E
+            WHERE E.eid = '".$eid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+
+    $lid = $row["lid"];
+    $name_value = $row["name"];
+    $date_value = $row["dateTime"];
+    $event_category_value = $row["eventCategory"];
+    $desc_value = $row["description"];
+    $topic_value = $row["topic"];
+    $contact_email_value = $row["contactEmail"];
+    $visibility_value = $row["visibility_value"];
+    $contact_phone_value = $row["contactPhone"];
+
+    $sql = "SELECT description, latitude, longitude
+            FROM location L
+            WHERE L.lid = '".$lid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+    $conn->close();
+
     // TODO: retreive name
-    $name_value = "Event".$eid;
-    $date_value = "yesterday";
-    $start_time_value = "now";
-    $end_time_value = "yesterday";
-    $event_category_value = "alchohol";
-    $desc_value = "Wow. You are editing this Event! You're a really really really cool guy! :) Your so cool you approach absolute zero. Your really, really, ugh, ooooh, ahhh!! So mhmm.. oh yeah.. Cooooooooooooooooooool. (so cool)";
-    $topic_value = "r/mechanicalkeyboards";
-    $contact_email_value = "unprof3ssional6969@Thisprojectshallbefinished.xyzbecausexyzsarecool";
-    $contact_phone_value = "555-555-5555";
-    $pushlished_value = "soon";
+    $loc_use_default=false;
+    $loc_desc_value=$row[0];
+    $loc_long_value=floatval($row[2]);
+    $loc_lat_value=floatval($row[1]);
 }
 ?>
-<!--
-"name"                  $name_value
-"date"                  $date_value
-"start_time"            $start_time_value
-"end_time"              $end_time_value
-"event_category"        $event_category_value
-"desc"                  $desc_value
-"topic"                 $topic_value
-"contact_email"         $contact_email_value
-"contact_phone"         $contact_phone_value
-"published"             $published_value
--->

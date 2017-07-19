@@ -18,7 +18,7 @@ function login($userId, $password) {
         return false;
     }
 
-    $sql = "SELECT userType, userid, password FROM user as U WHERE U.name = '".$userId."'";
+    $sql = "SELECT userType, userid, password, uniemail FROM user as U WHERE U.name = '".$userId."'";
     $result = $conn->query($sql);
     if (!$result) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
@@ -37,11 +37,31 @@ function login($userId, $password) {
         return false;
     }
 
-    $conn->close();
-
     $_SESSION["userType"] = $row["userType"];
     $_SESSION["userName"] = $userId;
     $_SESSION["userId"] = $row["userid"];
+    $email = $row["uniemail"];
+
+
+    $userDomain = substr($email, strrpos($email, '@') + 1);
+    $sql = "SELECT uid
+            FROM university U
+            WHERE U.domain='".$userDomain."'";
+    $user_uid_result = $conn->query($sql);
+    if (!$user_uid_result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return "";
+    }
+    if ($user_uid_result->num_rows == 0)
+        $user_uid = "basd";
+    else
+        $user_uid = $user_uid_result->fetch_row()[0];
+
+    $_SESSION["userUni"] = $user_uid;
+
+    $conn->close();
+
     return true;
 }
 
