@@ -18,7 +18,7 @@ function login($userId, $password) {
         return false;
     }
 
-    $sql = "SELECT userType, userid, password FROM user as U WHERE U.name = '".$userId."'";
+    $sql = "SELECT userType, userid, password, email FROM user as U WHERE U.name = '".$userId."'";
     $result = $conn->query($sql);
     if (!$result) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
@@ -42,6 +42,8 @@ function login($userId, $password) {
     $_SESSION["userType"] = $row["userType"];
     $_SESSION["userName"] = $userId;
     $_SESSION["userId"] = $row["userid"];
+    $email = $row["email"];
+    $_SESSION["userDomain"] = substr($email, 0, strrpos($email, '@'));
     return true;
 }
 

@@ -37,17 +37,32 @@ function get_rso_events($uid) {
     if (!verify_member()) // Only members can see events
         return array();
 
+        global $error;
+
     $conn = connect_to_db();
     if ($conn->connect_error) {
         $error = ("Connection failed: " . $conn->connect_error);
         $conn->close();
-        return false;
+        return array();
     }
 
+    $sql = "SELECT eid, name
+            FROM event E, uni
+            WHERE E.uid='".$_SESSION["userId"]."'
+            AND S.rsoName = R.rsoName";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return array();
+    }
+    $rows = array();
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
     $conn->close();
 
-    // TODO: get event
-    return array("156", "45");
+    return $rows;
 }
 
 function set_university($uid) {
@@ -94,7 +109,7 @@ function set_university($uid) {
     $loc_desc=$row[0];
     $loc_long=floatval($row[2]);
     $loc_lat=floatval($row[1]);
-    $picsValue = "test1.png,test2.png,test3.png";
+    $picsValue = "test4.jpg";
 
     $uni_pics = create_pictures_list($picsValue);
     $uni_event_list = create_event_list(get_rso_events($uid));
@@ -121,8 +136,10 @@ function create_picture($resourceId) {
 // create a html list of pictures given comma separated pic file nmaes
 function create_event_list($events) {
     $list = "<ul>"; // Start list
-    foreach ($events as $eid) {
-        $list = $list."<li>".create_event($eid)."</li>";
+    foreach ($events as $row) {
+        $eid = $row["eid"];
+        $eName = $row["name"];
+        $list = $list."<li>".create_event($eid, $eName)."</li>";
     }
 
     $list = $list."</ul>";
@@ -130,12 +147,8 @@ function create_event_list($events) {
 }
 
 // create a html picture with a given resource
-function create_event($eid) {
-    return '<a href=event_view.php?eid='.$eid.'>'.get_event_name($eid).'</a>';
-}
-
-function get_event_name($eid) {
-    return "Some event ".$eid;
+function create_event($eid, $eName) {
+    return '<a href=event_view.php?eid='.$eid.'>'.$eName.'</a>';
 }
 
 // Set university values
