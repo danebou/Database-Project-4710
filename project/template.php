@@ -1,12 +1,14 @@
 <!-- 
-    all_universities.php
+    Index.php
 
-    This will be used to list all the universities publically
+    This will be used as the main page  and will display available links
 -->
 <?php
+    // Page to goto if the user is not logged in
+    $not_loggedin_page = "login.php";
     // This takes all of the register functionality and moves it into this file.
     // READ the comment for this file!
-    require_once("php/all_universities.php");
+    require_once("php/index.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,8 +100,8 @@
 
             <!-- Breadcrumbs -->
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                <li class="breadcrumb-item active"> Universities</li>
+                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                <li class="breadcrumb-item active"> Page Title</li>
             </ol>
 
             <!-- Icon Cards -->
@@ -173,11 +175,10 @@
             <!-- Area Chart Example -->
             <div class="card mb-3">
                 <div class="card-header">
-                    <i class="fa fa-area-chart"></i> Universities
+                    <i class="fa fa-area-chart"></i> Area Chart Example
                 </div>
                 <div class="card-block">
-                	<p class="small-text"> Now check out these universities that will help you lose weight fast, you can go to: </p>
-                    <p class="small-text"> <?php echo $university_list?> </p>
+                    <p class="small-text"> Hi </p>
                 </div>
                 <div class="card-footer small text-muted">
                     Updated yesterday at 11:59 PM
