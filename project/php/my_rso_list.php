@@ -70,10 +70,10 @@ function get_rso_list() {
         $rsoName = $row["rsoName"];
         $rsoAdmin = $row["adminid"];
         $list = $list."<tr>"; // Row start     
-        $list = $list.'<td><a href=rso_view.php?rsoName='.$rsoName.'>'.urldecode($rsoName).'</a></td>';
+        $list = $list.'<td><a href=rso_view.php?rsoName='.urlencode($rsoName).'>'.$rsoName.'</a></td>';
         if (is_owner_of_rso($rsoName, $rsoAdmin)) {
-            $list = $list.'<td><a href=rso_edit.php?rsoName='.$rsoName.'>Edit</a></td>';
-            $list = $list."<td>".create_delete_button($rsoName)."</td>"; // Delete button
+            $list = $list.'<td><a href=rso_edit.php?rsoName='.urlencode($rsoName).'>Edit</a></td>';
+            $list = $list.'<td><a href=rso_delete.php?rsoName='.urlencode($rsoName).'>Delete</a></td>'; // Delete button
         }
         $list = $list."<tr>"; // Row end
     }

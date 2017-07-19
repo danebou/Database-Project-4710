@@ -37,5 +37,7 @@ Now check out these spicy RSOs to join:
 
 <?php echo $status?>
 
+<?php echo $error?>
+
 </body>
 </html>

@@ -22,5 +22,9 @@ Students: <?php echo $rso_student_count?>
 
 <?php echo $rso_event_list ?>
 
+<br
+
+<?php echo $error ?>
+
 </body>
 </html>

@@ -14,15 +14,17 @@ session_start();
 $error = "";
 
 // Returns true if the user has access to this page (is the superadmin of the university)
-function verify_access($uid) {
+function verify_access($rsoName) {
     global $error;
-
-    if (empty($_SESSION["userType"]) || $_SESSION["userType"] != "superadmin") 
+    if (empty($_SESSION["userType"])) 
         return false;
 
-    // TODO: verify access
-    if ($uid == "") // New uni. We are okay
+    // Give access to new rso
+    if ($rsoName == "" && $_SESSION["userType"] != "superadmin")
         return true;
+
+    if ($_SESSION["userType"] != "admin")
+        return false;
 
     $conn = connect_to_db();
     if ($conn->connect_error) {
@@ -31,8 +33,8 @@ function verify_access($uid) {
         return false;
     }
 
-    $sql = "SELECT count(*) FROM university as U WHERE U.createProfileBy = '".$_SESSION["userId"]."'
-    AND U.uid = '".$uid."'";
+    $sql = "SELECT count(*) FROM rso as R WHERE R.adminid = '".$_SESSION["userId"]."'
+    AND R.rsoName = '".$rsoName."'";
     $result = $conn->query($sql);
     if (!$result) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
@@ -44,18 +46,18 @@ function verify_access($uid) {
 
     if (($result->fetch_row())[0] <= 0)
         return false;
-
+    
     return true;
 }
 
-if (!empty($_GET["uid"])) {
-    $uid = $_GET["uid"]; // set uid
+if (!empty($_GET["rsoName"])) {
+    $rsoName = urldecode($_GET["rsoName"]); // set uid
 
 // Verify that the user has access to this page
-if (!verify_access($uid))
+if (!verify_access($rsoName))
     goto_default_page();
 
-function delete_uni($uid) {
+function delete_rso($rsoName) {
     global $error;
 
     $conn = connect_to_db();
@@ -66,8 +68,8 @@ function delete_uni($uid) {
     }
 
     // Delete
-    $sql = "DELETE FROM university WHERE createProfileBy = '".$_SESSION["userId"]."'
-    AND uid = '".$uid."'";
+    $sql = "DELETE FROM rso WHERE adminid = '".$_SESSION["userId"]."'
+    AND rsoName = '".$rsoName."'";
     if (!$conn->query($sql)) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
         $conn->close();
@@ -77,8 +79,8 @@ function delete_uni($uid) {
     $conn->close();
 }
 
-if ($uid != "")
-    delete_uni($uid);
+if ($rsoName != "")
+    delete_rso($rsoName);
     if ($error == "") 
-        goto_page("my_university_list.php");
+        goto_page("my_rso_list.php");
 }

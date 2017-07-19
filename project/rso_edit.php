@@ -21,8 +21,6 @@
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 RSO Name: <input type="text" name="newName" value="<?php echo $name_value?>">
 <br>
-Number of Students: <?php echo $studCount_value?> <!-- Cannot be edited -->
-<br>
 Description: <textarea name="desc" rows="5" cols="40"><?php echo $desc_value?></textarea>
 <br>
 <input type="hidden" name="rsoName" value="<?php echo $rsoName?>">

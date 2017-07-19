@@ -6,6 +6,7 @@
 */ 
 // Include common functions
 require_once("common.php");
+require_once("database.php");
 
 // default
 $rso_name = "";
@@ -13,9 +14,54 @@ $rso_desc = "";
 $rso_student_count = "";
 $rso_event_list = "";
 
+$error = "";
+
 function verify_member($rsoName) {
-    // TODO verify user is a member of 
-    return true;
+    global $error;
+    if (empty($_SESSION["userType"])) 
+        return false;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    // Check admin
+    $sql = sprintf("SELECT count(*) 
+    FROM rso as R 
+    WHERE R.adminid = '%s'
+    AND R.rsoName = '%s'", 
+    $_SESSION["userId"], $rsoName);
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    if (($result->fetch_row())[0] > 0) {
+        $conn->close();
+        return true;
+    }
+
+    $sql = sprintf("SELECT count(*) 
+    FROM stud_join as J 
+    WHERE J.userid = '%s'
+    AND R.rsoName = '%s'", 
+    $_SESSION["userId"], $rsoName);
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    if (($result->fetch_row())[0] > 0)
+        return true;
+
+    $conn->close();
 }
 
 function get_rso_events($rsoName) {
@@ -26,12 +72,58 @@ function get_rso_events($rsoName) {
     return array("156", "45");
 }
 
+function get_student_count($rsoName) {
+    global $error;
+
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = sprintf("SELECT count(*) 
+    FROM stud_joins as J
+    WHERE J.rsoName = '%s'", 
+    $rsoName);
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return 0;
+    }
+
+    $conn->close();
+
+    return ($result->fetch_row())[0];
+}
+
 function set_rso($rsoName) {
-    global $rso_name, $rso_desc, $rso_student_count, $rso_event_list;
-    $rso_name = $rsoName;
+    global $rso_name, $rso_desc, $rso_student_count, $rso_event_list, $error;
+    $conn = connect_to_db();
+    if ($conn->connect_error) {
+        $error = ("Connection failed: " . $conn->connect_error);
+        $conn->close();
+        return false;
+    }
+
+    $sql = "SELECT description
+            FROM rso R
+            WHERE R.rsoName ='".$rsoName."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+
+    $row = $result->fetch_row();
+    $conn->close();
+    
     // TODO: get rso values
-    $rso_desc = "This is a todo-er. But this rso likes to party!";
-    $rso_student_count = "43 (Wow! That's a lot of students! More than any university. Weird. You're weird. No, I'm werid. Well, aren't we all";
+    $rso_name = $rsoName;
+    $rso_desc = $row[0];
+    $rso_student_count = get_student_count($rsoName);
     $rso_event_list = create_event_list(get_rso_events($rsoName));
 }
 
@@ -58,7 +150,7 @@ function get_event_name($eid) {
 // Set university values
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     if (!empty($_GET["rsoName"])) {
-       set_rso($_GET["rsoName"]);
+       set_rso(urldecode($_GET["rsoName"]));
     }
 }
 ?>

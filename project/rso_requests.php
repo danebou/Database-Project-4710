@@ -13,7 +13,7 @@
 
 <a href="index.php">Home</a>
 <br>
-<b> Non-RSO Event Requests </b>
+<b> RSO Requests </b>
 <br>
 These are non-RSO events requiring approval
 <br>
@@ -25,6 +25,7 @@ Now check out these groovy rso join requests you can approve/remove:
 <?php echo $rso_requests?>
 
 <br>
+<?php echo $error?>
 
 </body>
 </html>
