@@ -17,6 +17,10 @@ $name_value = "";
 $studCount_value = "0";
 $desc_value = "";
 $domain_value = "";
+$loc_desc_value = "";
+$loc_long_value = 0.0;
+$loc_lat_value = 0.0;
+$loc_use_default = true;
 
 $uid = "";
 
@@ -94,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $desc = htmlspecialchars($_POST["desc"]);
     $pictures = "";
-    $location = array("test_loc", 0.01, 0.02); // (name, long, lat)
+    $location = array($_POST["loc_desc"], $_POST["loc_lat"], $_POST["loc_long"]); // (name, long, lat)
 
     // On success go to the next page
     if ($error == "") {
@@ -129,7 +133,7 @@ function create_university($uid, $name, $studCount, $desc, $pictures, $domain, $
         return false;
     }
 
-    $sql = "INSERT into location (name, latitude, longitude) 
+    $sql = "INSERT into location (description, latitude, longitude) 
         VALUES ('".$location[0]."', '".$location[1]."', '".$location[2]."')";
     $result = $conn->query($sql);
     if (!$result) {
@@ -192,7 +196,7 @@ function edit_university($uid, $name, $studCount, $desc, $pictures, $domain, $lo
     }
 
     $sql = "UPDATE location 
-        SET name='".$location[0]."', latitude='".$location[1]."', longitude='".$location[2]."'
+        SET description='".$location[0]."', latitude='".$location[1]."', longitude='".$location[2]."'
         WHERE lid='".$lid."'"; 
     $result = $conn->query($sql);
     if (!$result) {
@@ -206,7 +210,8 @@ function edit_university($uid, $name, $studCount, $desc, $pictures, $domain, $lo
 
 function university_edit_fill($uid) {
     global $error;
-    global $name_value, $studCount_value, $desc_value, $domain_value;
+    global $name_value, $studCount_value, $desc_value, $domain_value,
+        $loc_desc_value, $loc_lat_value, $loc_long_value, $loc_use_default;
     if ($uid == "")
         return;
 
@@ -227,15 +232,29 @@ function university_edit_fill($uid) {
         return false;
     }
     $row = $result->fetch_row();
-    $conn->close();
 
     $lid = $row[5];
-
-    // TODO: retreive name
     $name_value = $row[1];
     $studCount_value = $row[0];
     $desc_value = $row[2];
     $domain_value = $row[3];
 
+    $sql = "SELECT description, latitude, longitude
+            FROM location L
+            WHERE L.lid = '".$lid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+    $conn->close();
+
+    // TODO: retreive name
+    $loc_use_default=false;
+    $loc_desc_value=$row[0];
+    $loc_long_value=floatval($row[2]);
+    $loc_lat_value=floatval($row[1]);
 }
 ?>
