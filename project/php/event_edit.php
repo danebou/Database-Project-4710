@@ -21,7 +21,7 @@ $topic_value = "";
 $contact_email_value = "";
 $contact_phone_value = "";
 $published_value = "";
-$type_value = "";
+$visibility_value = "";
 $loc_desc_value = "";
 $loc_long_value = 0.0;
 $loc_lat_value = 0.0;
@@ -98,7 +98,7 @@ event_edit_fill($eid);
 
 function event_edit_submit($eid, $name, $date, $event_category, 
         $desc, $topic, $contact_email, $contact_phone, $location, $visibility, $rsoName) {
-    $uid = get_uid();
+    $uid = $_SESSION["userUni"];
     if ($eid == "") { // create
         event_create($name, $date, $event_category, 
         $desc, $topic, $contact_email, $contact_phone, $location);
@@ -145,7 +145,7 @@ function event_create($name, $date, $event_category,
          $topic,
          $contact_email,
          $contact_phone,
-         $description
+         $description,
          $visibility,
          $rsoName == "" ? NULL : "'" + $rsoName + "'",
          $lid,
@@ -168,8 +168,8 @@ function event_edit($eid, $name, $date, $event_category,
 }
 
 function event_edit_fill($eid) {
-    global $name_value, $date_value, $event_category_value, 
-    $desc_value, $topic_value, $contact_email_value, $contact_phone_value, $published_value;
+    global $name_value, $date_value, $event_category_value, $visibility_value,
+    $desc_value, $topic_value, $contact_email_value, $contact_phone_value;
     global $error;
 
     if ($eid == "")
@@ -200,6 +200,7 @@ function event_edit_fill($eid) {
     $desc_value = $row["description"];
     $topic_value = $row["topic"];
     $contact_email_value = $row["contactEmail"];
+    $visibility_value = $row["visibility_value"];
     $contact_phone_value = $row["contactPhone"];
 
     $sql = "SELECT description, latitude, longitude

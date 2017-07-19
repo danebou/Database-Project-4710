@@ -15,7 +15,7 @@
 <html>
 <body>
 
-<b> Login </b>
+<b>Login </b>
 
 <!-- This displays a successful registration -->
 <span><?php echo $registration?></span>
@@ -32,7 +32,5 @@ Password: <input type="password" name="password">
 
 <!-- Registration link -->
 New User? <a href="register.php">Register</a>
-
-
 </body>
 </html>

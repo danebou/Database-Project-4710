@@ -26,7 +26,7 @@
 <!-- Registration form (Submit to backend in php/register.php"-->
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
 Event Name: <input type="text" name="name" value="<?php echo $name_value?>"><br>
-<select name="type" value = <?php echo $type_value ?>>
+<select name="visibility" value = <?php echo $visibility_value ?>>
   <option value="Public">Public (Requires Approval)</option>
   <option value="Private">University Only</option>
   <option value="RSOevent">RSO</option>

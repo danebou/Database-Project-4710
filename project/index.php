@@ -15,7 +15,7 @@
 
 <b> Main </b>
 <br>
-This is the main page. You are a <?php echo $_SESSION["userType"]?>
+Welcome <?php echo $_SESSION["userName"]?>
 <br>
 <br>
 Now checkout out these sick links you can go to:
