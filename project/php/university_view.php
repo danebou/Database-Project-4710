@@ -17,6 +17,11 @@ $uni_student_count = "";
 $uni_pics = "";
 $uni_event_list = "";
 
+$loc_desc = "";
+$loc_lat = 0.0;
+$loc_long = 0.0;
+
+
 $error = "";
 
 function verify_member() {
@@ -47,7 +52,8 @@ function get_rso_events($uid) {
 
 function set_university($uid) {
     global $error;
-    global $uni_name, $uni_desc, $uni_student_count, $uni_pics, $uni_event_list;
+    global $uni_name, $uni_desc, $uni_student_count, $uni_pics, $uni_event_list,
+    $loc_desc, $loc_long, $loc_lat;
 
     $conn = connect_to_db();
     if ($conn->connect_error) {
@@ -57,7 +63,24 @@ function set_university($uid) {
     }
 
     $sql = "SELECT numOfStudents, name, description, pictures, lid
-            FROM university";
+            FROM university U
+            WHERE U.uid ='".$uid."'";
+    $result = $conn->query($sql);
+    if (!$result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return false;
+    }
+    $row = $result->fetch_row();
+
+    $uni_name = $row[1];
+    $uni_desc = $row[2];
+    $uni_student_count = $row[0];
+    $lid = $row[4];
+
+    $sql = "SELECT description, latitude, longitude
+            FROM location L
+            WHERE L.lid = '".$lid."'";
     $result = $conn->query($sql);
     if (!$result) {
         $error = "Error: " . $sql . "<br>" . $conn->error;
@@ -67,11 +90,12 @@ function set_university($uid) {
     $row = $result->fetch_row();
     $conn->close();
 
+    // TODO: retreive name
+    $loc_desc=$row[0];
+    $loc_long=floatval($row[2]);
+    $loc_lat=floatval($row[1]);
     $picsValue = "test1.png,test2.png,test3.png";
 
-    $uni_name = $row[1];
-    $uni_desc = $row[2];
-    $uni_student_count = $row[0];
     $uni_pics = create_pictures_list($picsValue);
     $uni_event_list = create_event_list(get_rso_events($uid));
 }
