@@ -37,6 +37,21 @@ function login($userId, $password) {
         return false;
     }
 
+    $sql = "SELECT uid
+            FROM university U
+            WHERE U.domain='".$_SESSION["userDomain"]."'";
+    $user_uid_result = $conn->query($sql);
+    if (!$user_uid_result) {
+        $error = "Error: " . $sql . "<br>" . $conn->error;
+        $conn->close();
+        return "";
+    }
+
+    if ($user_uid_result->num_rows == 0)
+        $user_uid = "";
+    else
+        $user_uid = $user_uid_result->fetch_row()["uid"];
+
     $conn->close();
 
     $_SESSION["userType"] = $row["userType"];

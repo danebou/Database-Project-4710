@@ -96,33 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 event_edit_fill($eid);
 
-function get_uid() {
-    global $error;
-
-    $conn = connect_to_db();
-    if ($conn->connect_error) {
-        $error = ("Connection failed: " . $conn->connect_error);
-        $conn->close();
-        return "";
-    }
-
-    $sql = "SELECT uid
-            FROM rso R
-            WHERE R.rsoName ='".$rsoName."'";
-    $result = $conn->query($sql);
-    if (!$result) {
-        $error = "Error: " . $sql . "<br>" . $conn->error;
-        $conn->close();
-        return "";
-    }
-
-    if ($result->num_rows > 0)
-        return "";
-
-    $row = $result->fetch_row()[0];
-    $conn->close();
-}
-
 function event_edit_submit($eid, $name, $date, $event_category, 
         $desc, $topic, $contact_email, $contact_phone, $location, $visibility, $rsoName) {
     $uid = get_uid();
