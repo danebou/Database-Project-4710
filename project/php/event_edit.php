@@ -32,6 +32,28 @@ if (!empty($_POST["eid"])) {
     $eid = $_POST["eid"]; // set eid
 }
 
+/*
+    Gets a table of available pages to goto
+*/
+function get_accessable_page_links() {
+	// TODO: ad more links
+    $links = '<ul class="sidebar-nav navbar-nav">'; // start list
+    $links = $links.'<li class="nav-item"><a class="nav-link" href="index.php"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a> </li>';
+    $links = $links.'<li class="nav-item"><a class="nav-link" href="my_rso_list.php"><i class="fa fa-fw fa-address-book"></i> My RSOs</a> </li>';
+    $links = $links.'<li class="nav-item"><a class="nav-link" href="all_universities.php"><i class="fa fa-fw fa-institution"></i> Universities</a> </li>';
+    $links = $links.'<li class="nav-item"><a class="nav-link" href="my_event_list.php"><i class="fa fa-fw fa-calendar-o"></i> My Events</a> </li>';
+    $links = $links.'<li class="nav-item"><a class="nav-link" href="search_join_rso.php"><i class="fa fa-fw fa-search"></i> Search/Join RSO</a> </li>';
+    if ($_SESSION["userType"] == "admin") {
+        $links = $links.'<li class="nav-item"><a class="nav-link" href="rso_requests.php"><i class="fa fa-fw fa-area-chart"></i> RSO Join Requests</a> </li>';
+    }
+    if ($_SESSION["userType"] == "superadmin") {
+        $links = $links.'<li class="nav-item"><a class="nav-link" href="my_university_list.php"><i class="fa fa-fw fa-sitemap"></i> My Universities</a> </li>';
+        $links = $links.'<li class="nav-item"><a class="nav-link" href="event_requests.php"><i class="fa fa-fw fa-plus-square"></i> Non-RSO Event Requests</a> </li>';
+    }
+    $links = $links.'</ul>'; // close list
+    return $links;
+}
+
 // Returns true if the user has access to this page (is the superadmin of the university)
 function verify_access($eid) {
     if (empty($_SESSION["userType"])) 
@@ -97,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 } 
 
-rso_edit_fill($eid);
+event_edit_fill($eid);
 
 function event_edit_submit($eid, $name, $date, $start_time, $end_time, $event_category, 
     $desc, $topic, $contact_email, $contact_phone, $published) {
