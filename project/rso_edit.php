@@ -131,6 +131,54 @@
                         </a>
                     </div>
                 </div>
+                <div class="col-xl-3 col-sm-6 mb-3" <?php echo hide_admin_links()?> >
+                    <div class="card card-inverse card-danger o-hidden h-100">
+                        <div class="card-block">
+                            <div class="card-block-icon">
+                                <i class="fa fa-fw fa-user-plus"></i>
+                            </div>
+                            <div class="mr-5">
+                                RSO Join Requests
+                            </div>
+                        </div>
+                        <a href="rso_requests.php" class="card-footer clearfix small z-1">
+                            <span class="float-left">View the requests to join your RSOs</span>
+                            <span class="float-right"><i class="fa fa-angle-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 mb-3" <?php echo hide_superadmin_links()?>>
+                    <div class="card card-inverse card-primary o-hidden h-100">
+                        <div class="card-block">
+                            <div class="card-block-icon">
+                                <i class="fa fa-fw fa-sitemap"></i>
+                            </div>
+                            <div class="mr-5">
+                                My Universities
+                            </div>
+                        </div>
+                        <a href="my_university_list.php" class="card-footer clearfix small z-1">
+                            <span class="float-left">View the Universities you manage</span>
+                            <span class="float-right"><i class="fa fa-angle-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 mb-3" <?php echo hide_superadmin_links()?>>
+                    <div class="card card-inverse card-success o-hidden h-100">
+                        <div class="card-block">
+                            <div class="card-block-icon">
+                                <i class="fa fa-fw fa-plus-square"></i>
+                            </div>
+                            <div class="mr-5">
+                                Non-RSO Event Requests
+                            </div>
+                        </div>
+                        <a href="event_requests.php" class="card-footer clearfix small z-1">
+                            <span class="float-left">View the requests for Non-RSO Events</span>
+                            <span class="float-right"><i class="fa fa-angle-right"></i></span>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Area Chart Example -->

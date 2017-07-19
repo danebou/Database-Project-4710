@@ -19,6 +19,29 @@ if (empty($_SESSION["userType"]))
 // List of universities and edit/delete buttons for current superadmin
 $university_list = get_university_list();
 
+//Function to hide the big admin link cards
+function hide_admin_links() {
+	
+	if ($_SESSION["userType"] == "admin") {
+		$style = 'style="display:visible"';
+	}
+	else {
+		$style = 'style="display:none"';
+	}
+	return $style;
+}
+
+//Function to hide the big super admin link cards
+function hide_superadmin_links() {
+	
+	if ($_SESSION["userType"] == "superadmin") {
+		$style = 'style="display:visible"';
+	}
+	else {
+		$style = 'style="display:none"';
+	}
+	return $style;
+}
 
 /*
     Gets a table of available pages to goto

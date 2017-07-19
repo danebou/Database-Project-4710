@@ -25,11 +25,37 @@ $published_value = "";
 
 $eid = "";
 
+
+
 if (!empty($_GET["eid"])) {
     $eid = $_GET["eid"]; // set eid
 }
 if (!empty($_POST["eid"])) {
     $eid = $_POST["eid"]; // set eid
+}
+
+//Function to hide the big admin link cards
+function hide_admin_links() {
+	
+	if ($_SESSION["userType"] == "admin") {
+		$style = 'style="display:visible"';
+	}
+	else {
+		$style = 'style="display:none"';
+	}
+	return $style;
+}
+
+//Function to hide the big super admin link cards
+function hide_superadmin_links() {
+	
+	if ($_SESSION["userType"] == "superadmin") {
+		$style = 'style="display:visible"';
+	}
+	else {
+		$style = 'style="display:none"';
+	}
+	return $style;
 }
 
 /*

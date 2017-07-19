@@ -36,7 +36,10 @@ body.fixed-nav {
 
 .smaller {
   font-size: .7rem; }
-
+  
+.login-panel {
+  margin-top: 25%;
+}
 .o-hidden {
   overflow: hidden !important; }
 
