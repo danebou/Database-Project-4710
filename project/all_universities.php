@@ -99,7 +99,7 @@
             <!-- Breadcrumbs -->
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                <li class="breadcrumb-item active"> Universities</li>
+                <li class="breadcrumb-item active">Universities</li>
             </ol>
 
             <!-- Icon Cards -->
